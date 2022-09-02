@@ -7,12 +7,10 @@ const getProductos = async (req=request, res=response)=>{
     try {
         const result = await sql.query("USE [examen] DECLARE	@return_value int EXEC	@return_value = [dbo].[consultaProductos] SELECT	'Return Value' = @return_value")
         const mostrar = result.recordset;     
-        res.json(
-            
-            mostrar
+        res.json(mostrar)
+         
         
-        )
-        return mostrar
+        
     } catch (error) {
         console.log(error);
         
@@ -35,7 +33,6 @@ const getProductos = async (req=request, res=response)=>{
             misProductos
         )
         
-        return misProductos;
         
     } catch (error) {
         res.json({
@@ -57,14 +54,15 @@ const insertarProducto = async(req= request, res= response)=>{
     
     console.log(nombre, cantidad, tipo)
     try {
-       const insertar =  await sql.query("insert into Productos (Nombre,Cantidad,Tipo) values ( '"+nombre+"',"+cantidad+",'"+tipo+"')")
-       res.json(
-           {
-            nombre,
-            cantidad,
-            tipo
-           }
-    );
+       const insertar =  await sql.query("insert into Productos (Nombre,Cantidad,Tipo) values ( '"+nombre+"',"+cantidad+",'"+tipo+"'); SELECT SCOPE_IDENTITY() AS [ID]")
+       const  ID = insertar.recordset[0].ID
+       res.json({
+         Id:ID,
+         Nombre:nombre,
+         Cantidad:cantidad,
+         Tipo:tipo
+       })
+        
        
     } catch (error) {
         console.log(error);
@@ -79,7 +77,7 @@ const insertarProducto = async(req= request, res= response)=>{
 // ---------------------ACTUALIZAR PRODUCTO--------------------------------
 const actualizarProducto = async (req = request, res = response)=>{
     console.log('tratando de actualizar')
-    const myId = req.param('id');
+    const ID = req.param('id');
     
     console.log('producto verificado')
     const nombre = req.param('nombreP');
@@ -87,13 +85,13 @@ const actualizarProducto = async (req = request, res = response)=>{
     const tipo = req.param('tipoP');
     try {
 
-        const actualizar = await sql.query("UPDATE Productos SET Nombre = '"+nombre+"', Cantidad = "+cantidad+", Tipo = '"+tipo+"' where ID = "+myId+"") 
+        const actualizar = await sql.query("UPDATE Productos SET Nombre = '"+nombre+"', Cantidad = "+cantidad+", Tipo = '"+tipo+"' where ID = "+ID+"") 
         console.log(actualizar)
         res.json({
-            myId,
-            nombre,
-            cantidad,
-            tipo
+            Id:ID,
+            Nombre:nombre,
+            Cantidad:cantidad,
+            Tipo:tipo
         })
     } catch (error) {
         console.log(error);
